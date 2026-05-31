@@ -30,3 +30,16 @@ Your local directory is mounted into the container at `/home/work`, so any edits
 
 ### Stop the Container
 Press `Ctrl + C` in the terminal where the script is running.
+
+
+
+## Code flow for the CNN-LSTM model
+
+### Run eda.ipynb
+This will do some initial data preperation (like loading the files) and also some eda
+
+### Run datawrangling.ipynb
+This will setup and create all the datasets that will be used later on. Make sure to hold on to the .parquet files that were produced.
+
+### Run cnn_lstm_classifier.ipynb
+Take the .parquet files that were produced and put them in the same directory as cnn_lstm_classifier, or update the "base" file path in cnn_lstm_classifier.ipynb, then run it. I suggest running this in gooogle co-lab with the TPU, otherwise it will take a few hours.
