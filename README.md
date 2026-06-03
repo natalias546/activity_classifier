@@ -24,21 +24,41 @@ data/wisdm-dataset/raw/
 
 ```
 activity_classifier/
-├── data/                        # raw and processed data
-├── feature_engineering.py       # data loading, cleaning, joining, feature engineering
-├── model.py                     # windowing, train/val/test split, stacked model
-├── eda.py                       # exploratory data analysis and plots
-├── final.ipynb                  # EDA notebook
-├── classify.ipynb               # classification notebook
-├── launch-arm64.sh              # Docker launch script
+├── data/                            # raw and processed data
+├── rf_pipeline/                     # Random Forest pipeline (automated)
+│   ├── feature_engineering.py       # data loading, cleaning, joining, features
+│   ├── model.py                     # windowing, stacked RF model, evaluation
+│   └── eda.py                       # EDA plots saved to plots/
+├── lstm_pipeline/                   # CNN-LSTM pipeline (run on Google Colab)
+│   ├── eda.ipynb
+│   ├── datawrangling.ipynb
+│   ├── load_data.ipynb
+│   └── cnn_lstm_classifier.ipynb
+├── plots/                           # generated EDA plots
+├── main.py                          # runs rf_pipeline sequentially
+├── requirements.txt
+├── launch-arm64.sh                  # Docker launch script
 └── README.md
 ```
 
 ---
 
-## Pipeline
+## Pipelines
 
-### 1. Feature Engineering (`feature_engineering.py`)
+This project has two independent pipelines starting from the same raw data:
+
+| | Random Forest Pipeline | CNN-LSTM Pipeline |
+|--|--|--|
+| Location | `rf_pipeline/` | `lstm_pipeline/` |
+| How to run | `python main.py` | Notebooks on Google Colab |
+| Model | Stacked RF + Decision Tree | CNN-LSTM |
+| Hardware | Local CPU | Colab GPU/TPU |
+
+---
+
+## Random Forest Pipeline
+
+### 1. Feature Engineering (`rf_pipeline/feature_engineering.py`)
 
 - Loads 4 raw CSV streams (watch accel, watch gyro, phone accel, phone gyro)
 - Cleans the `z` column (trailing semicolons and whitespace)
@@ -56,7 +76,7 @@ activity_classifier/
   - `data/watch_features.parquet`
   - `data/phone_features.parquet`
 
-### 2. Modelling (`model.py`)
+### 2. Modelling (`rf_pipeline/model.py`)
 
 **Windowing**
 - Groups readings by subject and activity label, sorted by timestamp
@@ -72,7 +92,7 @@ activity_classifier/
 - Validation set probability vectors from both models joined on `(subject_id, activity_label, window_index)`
 - Decision Tree meta-classifier trained on concatenated probability vectors
 
-### 3. EDA (`eda.py`)
+### 3. EDA (`rf_pipeline/eda.py`)
 
 - Dataset overview, row counts, subject distribution
 - Activity distribution per source
@@ -81,6 +101,18 @@ activity_classifier/
 - Magnitude distribution by activity
 - Feature correlation heatmaps
 - Null/NaN check
+
+---
+
+## CNN-LSTM Pipeline
+
+Run the notebooks in order on **Google Colab** (GPU/TPU recommended):
+
+1. `lstm_pipeline/eda.ipynb` — initial data exploration and loading
+2. `lstm_pipeline/datawrangling.ipynb` — creates `.parquet` files used by the classifier
+3. `lstm_pipeline/cnn_lstm_classifier.ipynb` — trains the CNN-LSTM model
+
+> Update the `base` file path in `cnn_lstm_classifier.ipynb` to point to your parquet files, or place them in the same directory.
 
 ---
 
@@ -100,22 +132,41 @@ activity_classifier/
 ## Requirements
 
 ```bash
-pip install pyspark pandas pyarrow seaborn matplotlib numpy
+pip install -r requirements.txt
 ```
+
+| Package | Version |
+|---------|---------|
+| pyspark | 4.1.1 |
+| pandas | 3.0.3 |
+| pyarrow | 24.0.0 |
+| numpy | 2.4.6 |
+| matplotlib | 3.10.9 |
+| seaborn | 0.13.2 |
 
 ---
 
 ## Running
 
+Use `main.py` to run the full pipeline sequentially:
+
 ```bash
-# Step 1 — feature engineering (writes parquet files, ~10 min)
-python feature_engineering.py
+# Full run (first time — ~40 min total)
+python main.py
 
-# Step 2 — train and evaluate stacked model (~30 min)
-python model.py
+# Skip feature engineering if parquet files already exist (~30 min)
+python main.py --skip-features
 
-# Step 3 — exploratory data analysis
-python eda.py
+# Run everything including EDA
+python main.py --skip-features --eda
+```
+
+Or run individual steps manually:
+
+```bash
+python rf_pipeline/feature_engineering.py   # ~10 min — reads raw CSVs, writes parquet
+python rf_pipeline/model.py                  # ~30 min — trains stacked model, prints results
+python rf_pipeline/eda.py                    # generates plots to plots/
 ```
 
 ---
@@ -145,16 +196,3 @@ Your local directory is mounted into the container at `/home/work`, so any edits
 
 ### Stop the Container
 Press `Ctrl + C` in the terminal where the script is running.
-
-
-
-## Code flow for the CNN-LSTM model
-
-### Run eda.ipynb
-This will do some initial data preperation (like loading the files) and also some eda
-
-### Run datawrangling.ipynb
-This will setup and create all the datasets that will be used later on. Make sure to hold on to the .parquet files that were produced.
-
-### Run cnn_lstm_classifier.ipynb
-Take the .parquet files that were produced and put them in the same directory as cnn_lstm_classifier, or update the "base" file path in cnn_lstm_classifier.ipynb, then run it. I suggest running this in gooogle co-lab with the TPU, otherwise it will take a few hours.

@@ -10,7 +10,7 @@ from pyspark.ml.classification import RandomForestClassifier, DecisionTreeClassi
 from pyspark.ml import Pipeline
 from pyspark.ml.evaluation import MulticlassClassificationEvaluator
 
-BASE = os.path.dirname(os.path.abspath(__file__))
+BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 conf = pyspark.SparkConf().setAll([
     ('spark.master', 'local[6]'),

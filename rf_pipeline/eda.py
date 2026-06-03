@@ -8,7 +8,9 @@ import matplotlib.ticker as mtick
 import seaborn as sns
 import numpy as np
 
-BASE = os.path.dirname(os.path.abspath(__file__))
+BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PLOTS = os.path.join(BASE, "plots")
+os.makedirs(PLOTS, exist_ok=True)
 
 conf = pyspark.SparkConf().setAll([
     ('spark.master', 'local[6]'),
@@ -68,7 +70,7 @@ for ax, df, title in [(axes[0], watch_counts, "Watch"), (axes[1], phone_counts, 
         ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 1000,
                 f"{int(bar.get_height()):,}", ha="center", va="bottom", fontsize=7)
 plt.tight_layout()
-plt.savefig(f"{BASE}/eda_activity_distribution.png", dpi=150)
+plt.savefig(f"{PLOTS}/eda_activity_distribution.png", dpi=150)
 plt.show()
 
 # ── 3. Rows per Subject ───────────────────────────────────────────────────────
@@ -89,7 +91,7 @@ for ax, df, title in [(axes[0], watch_subj, "Watch"), (axes[1], phone_subj, "Pho
     ax.axhline(df["count"].mean(), color="red", linestyle="--", label=f"Mean: {int(df['count'].mean()):,}")
     ax.legend()
 plt.tight_layout()
-plt.savefig(f"{BASE}/eda_rows_per_subject.png", dpi=150)
+plt.savefig(f"{PLOTS}/eda_rows_per_subject.png", dpi=150)
 plt.show()
 
 # ── 4. Descriptive Statistics ─────────────────────────────────────────────────
@@ -120,7 +122,7 @@ for source, df, raw_cols, title in [
         ax.tick_params(axis="x", rotation=45)
     plt.suptitle(f"{title} — Raw Sensor Values by Activity", fontsize=14)
     plt.tight_layout()
-    plt.savefig(f"{BASE}/eda_{source}_boxplots.png", dpi=150)
+    plt.savefig(f"{PLOTS}/eda_{source}_boxplots.png", dpi=150)
     plt.show()
 
 # ── 7. Magnitude distribution by activity ────────────────────────────────────
@@ -136,7 +138,7 @@ for ax, df, col_, title in [
     ax.set_xlabel("Activity")
     ax.tick_params(axis="x", rotation=45)
 plt.tight_layout()
-plt.savefig(f"{BASE}/eda_magnitude_by_activity.png", dpi=150)
+plt.savefig(f"{PLOTS}/eda_magnitude_by_activity.png", dpi=150)
 plt.show()
 
 # ── 8. Feature correlation heatmap ───────────────────────────────────────────
@@ -155,7 +157,7 @@ for df, cols, title, fname in [
                 xticklabels=cols, yticklabels=cols)
     plt.title(f"{title} — Key Feature Correlation", fontsize=13)
     plt.tight_layout()
-    plt.savefig(f"{BASE}/eda_{fname}_correlation.png", dpi=150)
+    plt.savefig(f"{PLOTS}/eda_{fname}_correlation.png", dpi=150)
     plt.show()
 
 # ── 9. Null / missing value check ────────────────────────────────────────────
