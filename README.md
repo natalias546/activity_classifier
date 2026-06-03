@@ -101,7 +101,6 @@ This project has two independent pipelines starting from the same raw data:
 - Boxplots of sensor values by activity
 - Magnitude distribution by activity
 - Feature correlation heatmaps
-- Null/NaN check
 
 ---
 
@@ -114,21 +113,6 @@ Run the notebooks in order on **Google Colab** (GPU/TPU recommended):
 3. `lstm_pipeline/cnn_lstm_classifier.ipynb` — trains the CNN-LSTM model
 
 > Update the `base` file path in `cnn_lstm_classifier.ipynb` to point to your parquet files, or place them in the same directory.
-
----
-
-## Results
-
-| Model | Accuracy |
-|-------|----------|
-| Watch Random Forest (val) | 61.5% |
-| Phone Random Forest (val) | 25.9% |
-| Stacked model (test) | 43.4% |
-
-**Best classified activities:** Jogging (98.5%), Stairs (89.7%), Drinking (70.1%)  
-**Most challenging:** Soup, Chips, Sandwich eating (0%) — low-amplitude signals with high inter-subject variability
-
----
 
 ## Getting the Data
 
@@ -165,10 +149,10 @@ pip install -r requirements.txt
 Use `main.py` to run the full pipeline sequentially:
 
 ```bash
-# Full run (first time — ~40 min total)
+# Full run 
 python main.py
 
-# Skip feature engineering if parquet files already exist (~30 min)
+# Skip feature engineering if parquet files already exist
 python main.py --skip-features
 
 # Run everything including EDA
