@@ -37,6 +37,7 @@ activity_classifier/
 ├── plots/                           # generated EDA plots
 ├── main.py                          # runs rf_pipeline sequentially
 ├── requirements.txt
+|---  download_data.py               #Downloads data from S3 location
 ├── launch-arm64.sh                  # Docker launch script
 └── README.md
 ```
