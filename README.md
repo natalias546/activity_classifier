@@ -129,6 +129,19 @@ Run the notebooks in order on **Google Colab** (GPU/TPU recommended):
 
 ---
 
+## Getting the Data
+
+The raw dataset is hosted on a public S3 bucket. Run the download script to fetch it:
+
+```bash
+pip install boto3
+python download_data.py
+```
+
+This downloads the raw sensor files into `data/wisdm-dataset/raw/` automatically.
+
+---
+
 ## Requirements
 
 ```bash

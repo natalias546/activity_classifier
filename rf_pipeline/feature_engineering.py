@@ -107,4 +107,4 @@ print("watch columns:", watch.columns)
 watch.write.parquet(f"{BASE}/data/watch_features.parquet", mode="overwrite")
 phone.write.parquet(f"{BASE}/data/phone_features.parquet", mode="overwrite")
 
-print("Done. Parquet files written.")
+print(" Parquet files written.")
