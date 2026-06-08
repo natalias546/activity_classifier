@@ -194,3 +194,6 @@ Your local directory is mounted into the container at `/home/work`, so any edits
 
 ### Stop the Container
 Press `Ctrl + C` in the terminal where the script is running.
+
+##Generative AI Use
+Used Claude for questions and debugging, as well as formatting and use of best practices
